@@ -2,7 +2,7 @@
 
 A new Flutter project.
 
-## Jawaban atas Pertanyaan
+## Jawaban atas Pertanyaan (Tugas 7)
 - Widget tree itu adalah blueprint/deklarasi untuk bagian UI nya, nanti parent itu yang ngatur constraint, layout dan inheritance nya, hubungan parent-child itu ya hierarki untuk nantinya membangun menata dan mewarnai User Interface, perubahan terjadi kalau ada rebuild (pembuatan widget baru) dan flutter mengoptimalkan update lewat element/render tree
 
 - widget kustom itu kayak myApp(root class), myHomePage(halaman utama), InfoCard (kartu kecil untuk npm,nama,kelas), itemcard untuk tiap opsi di grid. 
@@ -49,6 +49,29 @@ final result = await Navigator.of(context).push(
 );
 
 kalo pake navigator 2.0 / route api itu untuk use-case yang kompleks kayak url, deep link / web. mereka lebiih fleksibel karena declarative routing. 
+
+
+## Jawaban atas Pertanyaan (Tugas 8)
+- beda navigator.push dan navigator.pushreplacement: 
+Navigator.push: nambah halaman ke atas stack, bisa balik lagi. bisa buat buka detail produk, lihat gambar, atau form sementara.
+Navigator.pushReplacement: ganti halaman sekarang, gak bisa balik. bisa buat setelah login, selesai checkout, atau splash → home.
+
+- cara memanfaatkan hierarchy widget: 
+Scaffold itu kerangka utama. taro AppBar di atas untuk judul/aksi, body untuk konten, dan drawer buat navigasi samping.
+Taro style AppBar sama setiap halaman supaya tampilan konsisten. Masukin LeftDrawer di Scaffold.drawer biar semua halaman punya menu yang sama.
+Nanti tampilan akan rapi dan navigasi seragam.
+
+- kelebihan menggunakan layoutwidget 
+Padding: kasih jarak antar field supaya rapi.
+SingleChildScrollView: bungkus form yang panjang biar gak overflow waktu keyboard muncul.
+ListView: lebih cocok untuk daftar panjang karena lebih efisien (lazy).
+Contoh:
+Form -> SingleChildScrollView -> Column -> Padding(TextFormField)
+
+- cara menyesuaikan tema: 
+Set di MaterialApp lewat theme: ThemeData(colorScheme: ColorScheme.fromSeed(seedColor: Color(0xFF...))).
+Pakai Theme.of(context).colorScheme.primary untuk AppBar, dan colorScheme.secondary untuk tombol supaya konsisten.
+
 
 
 
