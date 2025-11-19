@@ -73,7 +73,79 @@ Set di MaterialApp lewat theme: ThemeData(colorScheme: ColorScheme.fromSeed(seed
 Pakai Theme.of(context).colorScheme.primary untuk AppBar, dan colorScheme.secondary untuk tombol supaya konsisten.
 
 
+## Jawaban atas Pertanyaan (Tugas 9)
 
+- model Dart itu kayak blueprint atau template buat data yang kita ambil dari API. Misalnya, kita punya data produk dari Django yang berbentuk JSON, kita bikin class Product di Dart buat representasinya. Tanpa model, data cuma Map<String, dynamic>, jadi kita gak tau tipe datanya. Misal, price harus double, tapi kalau langsung pake map, bisa aja jadi String atau null tanpa error. Dengan model, kita bisa define double price.  Dart punya null-safety, tapi kalau pake map langsung, kita harus selalu cek data['price'] != null manual. Kita juga buat kode jadi lebih rapi dan mudah diubah
+Konsekuensinya kalau langsung pake Map<String, dynamic> tanpa model:
+Kode jadi berantakan, sulit debug karena error runtime (bukan compile-time).
+Gak aman null-safety, bisa crash kalau data kosong.
+Susah maintain, kalau API berubah, harus ubah banyak tempat.
+Lebih rentan typo, misal data['prce'] alih-alih data['price'], gak ketahuan sampe runtime.
+
+- Package http: Ini library dasar di Dart buat bikin HTTP request ke server. Kita pake http.get(), http.post(), dll., buat kirim data ke Django. Tanpa ini, gak bisa komunikasi sama server. Di tugas ini, kita pake http buat fetch data produk, login, dll.
+
+CookieRequest: Ini dari package pbp_django_auth, yang extend dari http tapi khusus buat handle cookie otomatis. Django pake session-based auth, jadi cookie penting buat maintain login state. CookieRequest otomatis simpan dan kirim cookie di setiap request, jadi kita gak perlu handle manual.
+
+Perbedaan peran:
+
+http: Basic HTTP client, kita handle semua sendiri (header, cookie, dll.). Cocok buat request sederhana tanpa auth.
+CookieRequest: Lebih advanced, fokus ke auth. Dia handle cookie otomatis, jadi cocok buat app yang butuh login/logout. Di tugas ini, kita pake CookieRequest karena butuh session auth dari Django.
+
+- Karena CookieRequest itu yang handle session dan cookie, jadi harus sama di seluruh app biar login state konsisten. Kalau setiap screen bikin instance baru, cookie gak tersimpan, jadi user harus login ulang tiap ganti halaman. 
+
+- Tambah 10.0.2.2 ke ALLOWED_HOSTS di Django: Karena emulator Android pake IP khusus 10.0.2.2 buat akses localhost host machine. Tanpa ini, Django tolak request dari emulator karena IP gak di-allow, jadi error 400 atau forbidden.
+
+Aktifkan CORS: Cross-Origin Resource Sharing. Flutter (web atau app) beda origin sama Django server. Tanpa CORS, browser blok request, jadi gak bisa fetch data. Kita install django-cors-headers dan allow semua origin atau specific.
+
+Pengaturan SameSite/Cookie: Cookie di Django harus set SameSite=None atau Lax biar bisa dikirim cross-origin. Kalau gak, cookie gak ikut dikirim, jadi auth gagal.
+
+Izin Akses Internet di Android: Di android/app/src/main/AndroidManifest.xml, tambah <uses-permission android:name="android.permission.INTERNET" />. Tanpa ini, app Android gak bisa akses internet.
+
+- User input data di form (misal, nama produk di product_form.dart).
+Form validasi input, kirim ke create_product_flutter di Django via CookieRequest.post().
+Django terima data, validasi, simpan ke DB, return success JSON.
+Flutter terima response, kalau success, update UI (misal, refresh list produk).
+Data dari DB ditarik via show_json, di-parse jadi model Product, ditampilkan di ListView.
+
+- Register: User isi form di Flutter, kirim ke /auth/register/ Django. Django cek username unik, bikin user baru, return success. Flutter navigate ke login.
+Login: User isi username/password, kirim ke /auth/login/ Django. Django authenticate, kalau bener set session cookie, return user data. Flutter simpan cookie via CookieRequest, navigate ke menu.
+Session Maintenance: CookieRequest kirim cookie di setiap request, jadi Django tau user logged in.
+Logout: User klik logout, kirim ke /auth/logout/ Django. Django clear session, delete cookie. Flutter clear state, back ke login
+
+- 1. Memastikan Deployment Django Berjalan Baik
+Clone repo football-ronaldo dari GitHub.
+Install dependencies: pip install -r requirements.txt.
+Run migrations: python manage.py migrate.
+Start server: python manage.py runserver.
+Test endpoint /json/ di browser atau Postman, pastikan return JSON produk.
+2. Implementasi Fitur Registrasi Akun di Flutter
+Bikin screen register.dart dengan form fields: username, password1, password2.
+Pake CookieRequest.post() ke /auth/register/ Django.
+Handle response: kalau success, navigate ke login; kalau error, tampilkan pesan.
+3. Membuat Halaman Login di Flutter
+Bikin screen login.dart dengan form: username, password.
+Kirim POST ke /auth/login/ Django via CookieRequest.
+Kalau success, simpan cookie dan navigate ke menu; kalau gagal, tampil error.
+4. Mengintegrasikan Sistem Autentikasi Django dengan Flutter
+Pake package pbp_django_auth buat CookieRequest, yang handle session cookie otomatis.
+Wrap app dengan Provider buat share CookieRequest instance.
+Di setiap request, cookie dikirim otomatis, jadi Django tau user logged in.
+Tambah logout: POST ke /auth/logout/, clear cookie, back ke login.
+5. Membuat Model Kustom Sesuai Django
+Bikin class Product di models/product.dart dengan fields: id, name, price, description, thumbnail, category, is_featured, user.
+Tambah factory fromJson() buat parse JSON dari Django.
+Tambah toJson() buat kirim data balik.
+6-7. Membuat Halaman Daftar Item dari Endpoint JSON
+Bikin screen product_list.dart dengan FutureBuilder buat fetch data.
+Fetch dari /json/ Django, parse jadi List<Product>.
+Tampilkan di ListView dengan ProductCard, show: name, price, description, thumbnail, category, is_featured.
+8-11. Membuat Halaman Detail Item
+Bikin screen product_detail.dart, terima Product object dari navigation.
+Tampilkan semua atribut: id, name, price, dll.
+Tambah ElevatedButton buat back ke list.
+12. Filter Item Berdasarkan User Login
+Di fetchProducts(), setelah fetch user dari /auth/user/, filter listProduct.where((p) => p.user == userId).
+Jadi cuma tampil produk milik user yang login.
 
 
 

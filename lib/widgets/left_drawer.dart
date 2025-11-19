@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:football_shop/menu.dart';
+import 'package:football_shop/screens/menu.dart';
 import 'package:football_shop/product_form.dart';
+import 'package:football_shop/screens/product_list.dart';
 
 class LeftDrawer extends StatelessWidget {
   const LeftDrawer({super.key});
@@ -40,7 +41,7 @@ class LeftDrawer extends StatelessWidget {
           ),
           ListTile(
             leading: const Icon(Icons.home_outlined),
-            title: const Text('Halaman Utama'),
+            title: const Text('Home'),
             onTap: () {
               Navigator.pushReplacement(
                 context,
@@ -49,8 +50,18 @@ class LeftDrawer extends StatelessWidget {
             },
           ),
           ListTile(
+            leading: const Icon(Icons.apps),
+            title: const Text('Product List'),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const ProductListPage()),
+              );
+            },
+          ),
+          ListTile(
             leading: const Icon(Icons.add_box),
-            title: const Text('Tambah Produk'),
+            title: const Text('Add Product'),
             onTap: () {
               Navigator.pushReplacement(
                 context,

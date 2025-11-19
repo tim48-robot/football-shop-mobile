@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:football_shop/widgets/left_drawer.dart';
 import 'package:football_shop/product_form.dart';
+import 'package:football_shop/screens/product_list.dart';
 
 class MyHomePage extends StatelessWidget {
     MyHomePage({super.key});
@@ -11,9 +12,9 @@ class MyHomePage extends StatelessWidget {
 
 
     final List<ItemHomepage> items = [
-        ItemHomepage("All Products", Icons.apps, Colors.blue),
-        ItemHomepage("My Products", Icons.storefront, Colors.green),
-        ItemHomepage("Create Product", Icons.add_box, Colors.red),
+        ItemHomepage("Product List", Icons.apps, Colors.blue),
+        ItemHomepage("My Item", Icons.inventory, Colors.green),
+        ItemHomepage("Add Product", Icons.add_box, Colors.red),
     ];
 
     @override
@@ -131,17 +132,16 @@ class ItemCard extends StatelessWidget {
 
       child: InkWell(
         onTap: () {
-          if (item.name == "Create Product") {
+          if (item.name == "Add Product") {
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => const ProductFormPage()),
             );
-          } else {
-            ScaffoldMessenger.of(context)
-              ..hideCurrentSnackBar()
-              ..showSnackBar(
-                SnackBar(content: Text("Kamu telah menekan tombol ${item.name}!"))
-              );
+          } else if (item.name == "Product List" || item.name == "My Item") {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const ProductListPage()),
+            );
           }
         },
         child: Container(
